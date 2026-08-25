@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     if (argc < 3)
     {
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     /* Arguments */
     Arguments args = {0};
-    args.type = SOCK_STREAM;
+    args.s_type = SOCK_STREAM;
     parse_arguments(argv, &args);
 
     if (!is_valid_ip(argv[1]))

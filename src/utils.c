@@ -36,7 +36,7 @@ void parse_arguments(char **arguments, Arguments *args)
 
         if (strcmp(arguments[i], "-u") == 0)
         {
-            args->type = SOCK_DGRAM;
+            args->s_type = SOCK_DGRAM;
             continue;
         }
     }
@@ -99,5 +99,5 @@ void debug_args(Arguments *args)
     {
         printf("%i\n", args->port);
     }
-    printf("%s\n", args->type == SOCK_STREAM ? "SOCK_STREAM" : "SOCK_DGRAM");
+    printf("%s\n", args->s_type == SOCK_STREAM ? "SOCK_STREAM" : "SOCK_DGRAM");
 }

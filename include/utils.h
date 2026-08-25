@@ -5,11 +5,11 @@
 
 typedef struct Arguments
 {
+    int s_type; 
     const char *ip;
     int port;
     int port_min;
     int port_max;
-    int type;
 } Arguments;
 
 void parse_arguments(char **arguments, Arguments *args);

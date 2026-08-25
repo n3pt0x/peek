@@ -1,4 +1,5 @@
 #include "scan.h"
+#include "socket.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -13,11 +14,11 @@ int simple_scan(const Arguments *args)
     struct sockaddr_in addr;
     socklen_t addr_len = sizeof(addr);
 
-    sock = socket(AF_INET, args->type, 0);
+    sock = init_tcp_socket();
     if (sock < 0)
     {
         fprintf(stderr, "[Error] Socket creation failed %s\n", strerror(errno));
-        goto close;
+        return -1;
     }
 
     addr.sin_family = AF_INET;
@@ -25,16 +26,13 @@ int simple_scan(const Arguments *args)
     if (inet_pton(AF_INET, args->ip, &(addr.sin_addr)) <= 0)
     {
         fprintf(stderr, "[Error] IP adress is invalid: %s\n", args->ip);
-        goto close;
+        return -1;
     }
 
     conn = connect(sock, (const struct sockaddr *)&addr, addr_len);
 
     close(sock);
     return (conn == 0);
-close:
-    if (sock >= 0) close(sock);
-    return 0;
 }
 
 int scan_range(const Arguments *args)
