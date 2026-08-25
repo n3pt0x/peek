@@ -6,10 +6,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int main(int argc, char **argv)
-{
-    if (argc < 3)
-    {
+int main(int argc, char **argv) {
+    if (argc < 3) {
         printf("Usage: %s <ip> -p <port>\n", argv[0]);
         return 1;
     }
@@ -17,8 +15,7 @@ int main(int argc, char **argv)
     /* Arguments */
     Arguments args = {0};
     args.s_type = SOCK_STREAM;
-    if (parse_arguments(argv, &args) != 0)
-    {
+    if (parse_arguments(argv, &args) != 0) {
         return EXIT_FAILURE;
     }
 

@@ -8,23 +8,25 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int simple_scan(const Arguments *args)
-{
+int simple_scan(const Arguments *args) {
     int sock, conn;
     struct sockaddr_in addr;
     socklen_t addr_len = sizeof(addr);
 
-    sock = init_tcp_socket();
-    if (sock < 0)
-    {
+    if (args->s_type == SOCK_DGRAM) {
+        sock = init_udp_socket();
+    } else {
+        sock = init_tcp_socket();
+    }
+
+    if (sock < 0) {
         fprintf(stderr, "[Error] Socket creation failed %s\n", strerror(errno));
         return -1;
     }
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(args->port);
-    if (inet_pton(AF_INET, args->ip, &(addr.sin_addr)) <= 0)
-    {
+    if (inet_pton(AF_INET, args->ip, &(addr.sin_addr)) <= 0) {
         fprintf(stderr, "[Error] IP adress is invalid: %s\n", args->ip);
         return -1;
     }
@@ -35,22 +37,18 @@ int simple_scan(const Arguments *args)
     return (conn == 0);
 }
 
-int scan_range(const Arguments *args)
-{
-    printf("%s" ,args->ip);
+int scan_range(const Arguments *args) {
+    printf("%s", args->ip);
     return 0;
 }
 
-void handle_scan(const Arguments *args)
-{
-    if (args->port)
-    {
+void handle_scan(const Arguments *args) {
+    if (args->port) {
         char *state = simple_scan(args) ? "open" : "closed";
         printf("Port %d is %s\n", args->port, state);
     }
 
-    if (args->port_min && args->port_max)
-    {
+    if (args->port_min && args->port_max) {
         scan_range(args);
     }
 }
