@@ -8,41 +8,6 @@
 #include <string.h>
 #include <sys/socket.h>
 
-static bool parse_ip(const char *ip, Arguments *args);
-static bool parse_port(char *str, Arguments *args);
-
-void parse_arguments(char **arguments, Arguments *args)
-{
-    /* IP */
-    if (arguments[1])
-    {
-        parse_ip(arguments[1], args);
-    }
-
-    for (int i = 0; arguments[i] != NULL; i++)
-    {
-        if (strcmp(arguments[i], "-p") == 0)
-        {
-            if (arguments[i + 1])
-            {
-                parse_port(arguments[i + 1], args);
-            }
-            else
-            {
-                printf("Arguments -p is empty");
-                exit(EXIT_FAILURE);
-            }
-            continue;
-        }
-
-        if (strcmp(arguments[i], "-u") == 0)
-        {
-            args->s_type = SOCK_DGRAM;
-            continue;
-        }
-    }
-}
-
 static bool parse_ip(const char *ip, Arguments *args)
 {
     if (is_valid_ip(ip))
@@ -82,7 +47,44 @@ static bool parse_port(char *str, Arguments *args)
     return true;
 }
 
-void debug_args(Arguments *args)
+int parse_arguments(char **arguments, Arguments *args)
+{
+    /* IP */
+    if (arguments[1])
+    {
+        if (!parse_ip(arguments[1], args))
+        {
+            return -1;
+        }
+    }
+
+    for (int i = 2; arguments[i] != NULL; i++)
+    {
+        if (strcmp(arguments[i], "-p") == 0)
+        {
+            if (arguments[i + 1])
+            {
+                parse_port(arguments[i + 1], args);
+            }
+            else
+            {
+                printf("Arguments -p is empty");
+                return -1;
+            }
+            continue;
+        }
+
+        if (strcmp(arguments[i], "-u") == 0)
+        {
+            args->s_type = SOCK_DGRAM;
+            continue;
+        }
+    }
+
+    return 0;
+}
+
+void debug_args(const Arguments *args)
 {
     if (args->ip)
     {

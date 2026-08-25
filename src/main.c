@@ -1,5 +1,4 @@
 #include "scan.h"
-#include "utils.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -18,15 +17,12 @@ int main(int argc, char **argv)
     /* Arguments */
     Arguments args = {0};
     args.s_type = SOCK_STREAM;
-    parse_arguments(argv, &args);
-
-    if (!is_valid_ip(argv[1]))
+    if (parse_arguments(argv, &args) != 0)
     {
-        printf("Format of ip address is not valid\nUsage %s <ip> -p <port>\n", argv[0]);
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     /* Scan */
     handle_scan(&args);
-    return 0;
+    return EXIT_SUCCESS;
 }

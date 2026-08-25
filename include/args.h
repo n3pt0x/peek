@@ -10,6 +10,7 @@ typedef struct Arguments
     int port_max;
 } Arguments;
 
-void parse_arguments(char **arguments, Arguments *args);
+int parse_arguments(char **arguments, Arguments *args);
+void debug_args(const Arguments *args);
 
 #endif /* ARGS_H */
