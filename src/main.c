@@ -1,3 +1,4 @@
+#include "args.h"
 #include "scan.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -15,12 +16,14 @@ int main(int argc, char **argv)
 
     /* Arguments */
     Args args = {0};
-    args.s_type = SOCK_STREAM;
+    
     if (parse_args(argc, argv, &args) != 0) {
+        free_args(&args);
         return EXIT_FAILURE;
     }
 
     /* Scan */
     handle_scan(&args);
+    free_args(&args);
     return EXIT_SUCCESS;
 }

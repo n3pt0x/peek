@@ -92,6 +92,9 @@ int set_timeout(Args *args, uint32_t timeout)
 
 int parse_args(int argc, char **argv, Args *args)
 {
+    // Default value
+    args->s_type = SOCK_STREAM;
+
     int opt;
     int option_index = 0;
 
@@ -137,4 +140,12 @@ void debug_args(const Args *args)
         printf("%i\n", args->port);
     }
     printf("%s\n", args->s_type == SOCK_STREAM ? "SOCK_STREAM" : "SOCK_DGRAM");
+}
+
+void free_args(Args *args)
+{
+    if (args->ip) {
+        free(args->ip);
+        args->ip = NULL;
+    }
 }
