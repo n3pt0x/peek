@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     /* Arguments */
     Args args = {0};
     args.s_type = SOCK_STREAM;
-    if (parse_arguments(argv, &args) != 0) {
+    if (parse_args(argc, argv, &args) != 0) {
         return EXIT_FAILURE;
     }
 
