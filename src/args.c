@@ -118,11 +118,11 @@ int parse_args(int argc, char **argv, Args *args)
             break;
         case 't': {
             unsigned long timeout = strtoul(optarg, NULL, 10);
-            
             if (timeout < 1 || timeout > 200) {
-                fprintf(stderr, "[Error] Timeout value must be between 1 and 200: %lu\n", timeout);
+                fprintf(stderr, "[Error] Timeout value must be between 1 and 200\n");
                 return -1;
             }
+            args->timeout = (int)timeout;
             break;
         }
         }
@@ -148,6 +148,10 @@ void debug_args(const Args *args)
         printf("%i\n", args->max_port);
     } else {
         printf("%i\n", args->port);
+    }
+
+    if (args->timeout) {
+        printf("%d\n", args->timeout);
     }
     printf("%s\n", args->s_type == SOCK_STREAM ? "SOCK_STREAM" : "SOCK_DGRAM");
 }

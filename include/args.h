@@ -9,7 +9,7 @@ typedef struct Args {
     uint16_t port;
     uint16_t min_port;
     uint16_t max_port;
-    uint32_t timeout;
+    int timeout;
     uint32_t flags;
 } Args;
 
