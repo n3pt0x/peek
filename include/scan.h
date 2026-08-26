@@ -3,8 +3,8 @@
 
 #include "args.h"
 
-void handle_scan(const Arguments *args);
-int simple_scan(const Arguments *args);
-int scan_range(const Arguments *args);
+void handle_scan(const Args *args);
+int simple_scan(const Args *args);
+int scan_range(const Args *args);
 
 #endif /* SCAN_H */

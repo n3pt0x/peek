@@ -6,7 +6,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int init_tcp_socket(void) {
+int init_tcp_socket(void)
+{
     int sock;
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -17,7 +18,8 @@ int init_tcp_socket(void) {
     return sock;
 }
 
-int init_udp_socket(void) {
+int init_udp_socket(void)
+{
     int sock;
     sock = socket(AF_INET, SOCK_DGRAM, 0);
 

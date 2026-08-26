@@ -8,7 +8,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int simple_scan(const Arguments *args) {
+int simple_scan(const Args *args)
+{
     int sock, conn;
     struct sockaddr_in addr;
     socklen_t addr_len = sizeof(addr);
@@ -37,12 +38,14 @@ int simple_scan(const Arguments *args) {
     return (conn == 0);
 }
 
-int scan_range(const Arguments *args) {
+int scan_range(const Args *args)
+{
     printf("%s", args->ip);
     return 0;
 }
 
-void handle_scan(const Arguments *args) {
+void handle_scan(const Args *args)
+{
     if (args->port) {
         char *state = simple_scan(args) ? "open" : "closed";
         printf("Port %d is %s\n", args->port, state);

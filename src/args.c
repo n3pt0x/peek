@@ -8,7 +8,8 @@
 #include <string.h>
 #include <sys/socket.h>
 
-static bool parse_ip(const char *ip, Arguments *args) {
+static bool parse_ip(const char *ip, Args *args)
+{
     if (is_valid_ip(ip)) {
         args->ip = strdup(ip);
         return true;
@@ -18,7 +19,8 @@ static bool parse_ip(const char *ip, Arguments *args) {
     return false;
 }
 
-static bool parse_port(char *str, Arguments *args) {
+static bool parse_port(char *str, Args *args)
+{
     int port = atol(str);
 
     if (port == 0) {
@@ -40,7 +42,8 @@ static bool parse_port(char *str, Arguments *args) {
     return true;
 }
 
-int parse_arguments(char **arguments, Arguments *args) {
+int parse_arguments(char **arguments, Args *args)
+{
     /* IP */
     if (arguments[1]) {
         if (!parse_ip(arguments[1], args)) {
@@ -68,7 +71,8 @@ int parse_arguments(char **arguments, Arguments *args) {
     return 0;
 }
 
-void debug_args(const Arguments *args) {
+void debug_args(const Args *args)
+{
     if (args->ip) {
         printf("%s\n", args->ip);
     }
