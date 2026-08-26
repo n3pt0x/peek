@@ -15,9 +15,9 @@ int simple_scan(const Args *args)
     socklen_t addr_len = sizeof(addr);
 
     if (args->s_type == SOCK_DGRAM) {
-        sock = init_udp_socket();
+        sock = init_socket(args->s_type);
     } else {
-        sock = init_tcp_socket();
+        sock = init_socket(SOCK_STREAM);
     }
 
     if (sock < 0) {
