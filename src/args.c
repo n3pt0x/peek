@@ -31,17 +31,70 @@ static bool parse_ip(const char *ip, Args *args)
     return false;
 }
 
-static int parse_port(char *str, Args *args)
+static inline int is_valid_port(int port)
 {
-    int port = strtoul(str, NULL, 10);
+    return 1 < port && port <= 65535;
+}
 
-    if (port <= 0 || port > 65535) {
+static int parse_port_value(const char *str, Args *args)
+{
+    char *endptr;
+    int port = strtoul(str, &endptr, 10);
+
+    if (endptr == str || *endptr != '\0') {
+        fprintf(stderr, "[Error] Port value is incorrect: %s", str);
+        return -1;
+    }
+
+    if (is_valid_port(port) == 0) {
         fprintf(stderr, "[Error] Port value must be between 0 and 65535: %i\n", port);
         return -1;
     }
 
     args->port = port;
     return 0;
+}
+
+static int parse_port_range(const char *str, Args *args)
+{
+    char *copy = strdup(str);
+    if (!copy) {
+        fprintf(stderr, "[Error] Memory allocation failed\n");
+        return -1;
+    }
+
+    char *min_str = strtok(copy, "-");
+    char *max_str = strtok(NULL, "-");
+
+    if (!min_str || !max_str) {
+        fprintf(stderr, "[Error] Invalid port range\n");
+        goto cleanup;
+    }
+
+    unsigned long min = strtoul(min_str, NULL, 10);
+    unsigned long max = strtoul(max_str, NULL, 10);
+
+    if (is_valid_port(min) == 0 || is_valid_port(max) == 0 || min > max) {
+        fprintf(stderr, "[Error] Invalid port range '%s'\n", str);
+        goto cleanup;
+    }
+
+    args->min_port = min;
+    args->max_port = max;
+    SAFE_FREE(copy);
+    return 0;
+
+cleanup:
+    SAFE_FREE(copy);
+    return -1;
+}
+
+static int parse_port(const char *str, Args *args)
+{
+    if (strstr(str, "-") != 0)
+        return parse_port_range(str, args);
+        
+    return parse_port_value(str, args);
 }
 
 int parse_args(int argc, char **argv, Args *args)
@@ -90,9 +143,9 @@ void debug_args(const Args *args)
     if (args->ip)
         printf("%s\n", args->ip);
 
-    if (args->port_min && args->port_max) {
-        printf("%i\n", args->port_min);
-        printf("%i\n", args->port_max);
+    if (args->min_port && args->max_port) {
+        printf("%i\n", args->min_port);
+        printf("%i\n", args->max_port);
     } else {
         printf("%i\n", args->port);
     }

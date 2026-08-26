@@ -6,9 +6,9 @@
 typedef struct Args {
     int s_type;
     char *ip;
-    int port;
-    int port_min;
-    int port_max;
+    uint16_t port;
+    uint16_t min_port;
+    uint16_t max_port;
     uint32_t timeout;
     uint32_t flags;
 } Args;

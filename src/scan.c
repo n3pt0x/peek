@@ -51,7 +51,7 @@ void handle_scan(const Args *args)
         printf("Port %d is %s\n", args->port, state);
     }
 
-    if (args->port_min && args->port_max) {
+    if (args->min_port && args->max_port) {
         scan_range(args);
     }
 }
