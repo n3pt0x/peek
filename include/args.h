@@ -10,6 +10,7 @@ typedef struct Args {
     int port_min;
     int port_max;
     uint32_t timeout;
+    uint32_t flags;
 } Args;
 
 int parse_args(int argc, char **argv, Args *args);

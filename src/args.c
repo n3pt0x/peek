@@ -1,4 +1,5 @@
 #include "args.h"
+#include "flags.h"
 #include "utils.h"
 #include <arpa/inet.h>
 #include <bits/getopt_core.h>
@@ -32,61 +33,14 @@ static bool parse_ip(const char *ip, Args *args)
 
 static int parse_port(char *str, Args *args)
 {
-    int port = atol(str);
+    int port = strtoul(str, NULL, 10);
 
     if (port <= 0 || port > 65535) {
-        fprintf(stderr, "Port must be between 0 and 65535");
+        fprintf(stderr, "[Error] Port value must be between 0 and 65535: %i\n", port);
         return -1;
     }
 
-    // Port range
-    if (strstr(str, "-") != 0) {
-        const char *port_range = strtok(str, "-");
-        args->port_min = atol(port_range);
-
-        port_range = strtok(NULL, "-");
-        args->port_max = atol(port_range);
-    } else {
-        args->port = atol(str);
-    }
-
-    return 0;
-}
-
-static int set_socket_type(Args *args, int type)
-{
-    if (!type) {
-        return -1;
-    }
-
-    if (type == SOCK_STREAM) {
-        args->s_type = SOCK_STREAM;
-        return 0;
-    }
-
-    if (type == SOCK_DGRAM) {
-        args->s_type = SOCK_DGRAM;
-        return 0;
-    }
-
-    return -1;
-}
-
-int set_timeout(Args *args, uint32_t timeout)
-{
-    if (!timeout) {
-        return -1;
-    }
-
-    if (timeout <= 0) {
-        return -1;
-    }
-
-    if (timeout > 200) {
-        return -1;
-    }
-
-    args->timeout = timeout;
+    args->port = port;
     return 0;
 }
 
@@ -106,15 +60,18 @@ int parse_args(int argc, char **argv, Args *args)
                 return -1;
             break;
         case 'u':
-            if (set_socket_type(args, SOCK_DGRAM) != 0)
-                return -1;
+            args->flags |= SCAN_UDP;
+            args->s_type = SOCK_DGRAM;
             break;
-        case 't':
-            if (set_timeout(args, strtoul(optarg, NULL, 10)) != 0) {
-                fprintf(stderr, "Timeout value must be between 1 and 65535");
+        case 't': {
+            unsigned long timeout = strtoul(optarg, NULL, 10);
+            
+            if (timeout < 1 || timeout > 200) {
+                fprintf(stderr, "[Error] Timeout value must be between 1 and 200: %lu\n", timeout);
                 return -1;
             }
             break;
+        }
         }
     }
 
