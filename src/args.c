@@ -91,9 +91,15 @@ cleanup:
 
 static int parse_port(const char *str, Args *args)
 {
+    if (strcmp(str, "-") == 0) {
+        args->min_port = 1;
+        args->max_port = 65535;
+        return 0;
+    }
+
     if (strstr(str, "-") != 0)
         return parse_port_range(str, args);
-        
+
     return parse_port_value(str, args);
 }
 
