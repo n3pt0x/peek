@@ -31,11 +31,6 @@ static bool parse_ip(const char *ip, Args *args)
     return false;
 }
 
-static inline int is_valid_port(int port)
-{
-    return 1 < port && port <= 65535;
-}
-
 static int parse_port_value(const char *str, Args *args)
 {
     char *endptr;
@@ -46,7 +41,7 @@ static int parse_port_value(const char *str, Args *args)
         return -1;
     }
 
-    if (is_valid_port(port) == 0) {
+    if (!is_valid_port(port)) {
         fprintf(stderr, "[Error] Port value must be between 0 and 65535: %i\n", port);
         return -1;
     }
@@ -74,7 +69,7 @@ static int parse_port_range(const char *str, Args *args)
     unsigned long min = strtoul(min_str, NULL, 10);
     unsigned long max = strtoul(max_str, NULL, 10);
 
-    if (is_valid_port(min) == 0 || is_valid_port(max) == 0 || min > max) {
+    if (!is_valid_port(min) || !is_valid_port(max) || min > max) {
         fprintf(stderr, "[Error] Invalid port range '%s'\n", str);
         goto cleanup;
     }

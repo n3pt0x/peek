@@ -1,6 +1,7 @@
 #include "scan.h"
 #include "flags.h"
 #include "socket.h"
+#include "utils.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -41,7 +42,10 @@ int simple_scan(const Args *args)
 
 int scan_range(const Args *args)
 {
-    printf("%d-%d\n", args->min_port, args->max_port);
+    if (!is_valid_port(args->min_port) || !is_valid_port(args->max_port) ) {
+        return -1;
+    }
+
     return 0;
 }
 
