@@ -40,18 +40,20 @@ int simple_scan(const Args *args)
 
 int scan_range(const Args *args)
 {
-    printf("%s", args->ip);
+    printf("%s\n", args->ip);
     return 0;
 }
 
-void handle_scan(const Args *args)
+int handle_scan(const Args *args)
 {
     if (args->port) {
-        char *state = simple_scan(args) ? "open" : "closed";
-        printf("Port %d is %s\n", args->port, state);
+        int state = simple_scan(args);
+        printf("Port %d is %s\n", args->port, (state == 0) ? "open" : "closed");
+        return state;
     }
 
-    if (args->min_port && args->max_port) {
-        scan_range(args);
-    }
+    if (args->min_port && args->max_port)
+        return scan_range(args);
+
+    return -1;
 }

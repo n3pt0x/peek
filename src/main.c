@@ -14,16 +14,23 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    int ret = EXIT_FAILURE;
+
     /* Arguments */
     Args args = {0};
     
     if (parse_args(argc, argv, &args) != 0) {
-        free_args(&args);
-        return EXIT_FAILURE;
+        goto arg_failure;
     }
 
     /* Scan */
-    handle_scan(&args);
+    if (handle_scan(&args) != 0) {
+        goto arg_failure;
+    }
+    
+    ret = EXIT_SUCCESS;
+
+arg_failure:
     free_args(&args);
-    return EXIT_SUCCESS;
+    return ret;
 }
