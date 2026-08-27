@@ -13,21 +13,8 @@
         }                                                                      \
     } while (0)
 
-bool is_valid_ip(const char *ip)
-{
-    struct sockaddr_in sa;
-    if (inet_pton(AF_INET, ip, &(sa.sin_addr)))
-        return true;
-    
-    return false;
-}
+static inline bool is_valid_port(int port) { return port > 0 && port <= 65535; }
 
-static inline bool is_valid_port(int port)
-{
-    if (1 < port && port <= 65535)
-        return true;
-
-    return false;
-}
+bool is_valid_ip(const char *ip);
 
 #endif /* UTILS_H */
