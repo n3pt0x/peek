@@ -81,6 +81,7 @@ static int parse_port_range(const char *str, Args *args)
 
     args->min_port = min;
     args->max_port = max;
+    args->flags |= SCAN_RANGE;
     SAFE_FREE(copy);
     return 0;
 
@@ -94,6 +95,7 @@ static int parse_port(const char *str, Args *args)
     if (strcmp(str, "-") == 0) {
         args->min_port = 1;
         args->max_port = 65535;
+        args->flags |= SCAN_RANGE;
         return 0;
     }
 

@@ -1,4 +1,5 @@
 #include "scan.h"
+#include "flags.h"
 #include "socket.h"
 #include <arpa/inet.h>
 #include <errno.h>
@@ -40,20 +41,20 @@ int simple_scan(const Args *args)
 
 int scan_range(const Args *args)
 {
-    printf("%s\n", args->ip);
+    printf("%d-%d\n", args->min_port, args->max_port);
     return 0;
 }
 
 int handle_scan(const Args *args)
 {
+    if (args->flags & SCAN_RANGE)
+        return scan_range(args);
+
     if (args->port) {
         int state = simple_scan(args);
         printf("Port %d is %s\n", args->port, (state == 0) ? "open" : "closed");
         return state;
     }
-
-    if (args->min_port && args->max_port)
-        return scan_range(args);
 
     return -1;
 }
