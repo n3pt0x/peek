@@ -117,7 +117,6 @@ int parse_args(int argc, char **argv, Args *args)
                 return -1;
             break;
         case 'u':
-            args->flags |= SCAN_UDP;
             args->s_type = SOCK_DGRAM;
             break;
         case 't': {

@@ -19,12 +19,12 @@ int main(int argc, char **argv)
     /* Arguments */
     Args args = {0};
     
-    if (parse_args(argc, argv, &args) != 0) {
+    if (parse_args(argc, argv, &args) < 0) {
         goto arg_failure;
     }
 
     /* Scan */
-    if (handle_scan(&args) != 0) {
+    if (handle_scan(&args) < 0) {
         goto arg_failure;
     }
     
