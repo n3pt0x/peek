@@ -42,7 +42,7 @@ static int parse_port_value(const char *str, Args *args)
     int port = strtoul(str, &endptr, 10);
 
     if (endptr == str || *endptr != '\0') {
-        fprintf(stderr, "[Error] Port value is incorrect: %s", str);
+        fprintf(stderr, "[Error] Port value is incorrect: %s\n", str);
         return -1;
     }
 
@@ -67,7 +67,7 @@ static int parse_port_range(const char *str, Args *args)
     char *max_str = strtok(NULL, "-");
 
     if (!min_str || !max_str) {
-        fprintf(stderr, "[Error] Invalid port range\n");
+        fprintf(stderr, "[Error] Invalid port range '%s'\n", str);
         goto cleanup;
     }
 
@@ -106,6 +106,7 @@ static int parse_port(const char *str, Args *args)
 int parse_args(int argc, char **argv, Args *args)
 {
     // Default value
+    memset(args, 0, sizeof(Args));
     args->s_type = SOCK_STREAM;
 
     int opt;
@@ -137,7 +138,7 @@ int parse_args(int argc, char **argv, Args *args)
     /* Parse IP */
     // getopt move unused arguments at the end of argv array
     if (!parse_ip(argv[optind], args)) {
-        fprintf(stderr, "IP format isn't valid: %s", argv[optind]);
+        fprintf(stderr, "IP format isn't valid: %s\n", argv[optind]);
         return -1;
     }
 
