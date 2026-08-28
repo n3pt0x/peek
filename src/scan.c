@@ -3,13 +3,20 @@
 #include "socket.h"
 #include "utils.h"
 #include <arpa/inet.h>
+#include <asm-generic/errno.h>
 #include <errno.h>
 #include <netinet/in.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+typedef struct StatusPort {
+    uint16_t port;
+    uint8_t status;
+} StatusPort;
 
 static int scan_single_tcp_port(const Args *args, uint16_t port)
 {
@@ -22,7 +29,7 @@ static int scan_single_tcp_port(const Args *args, uint16_t port)
         return -1;
     }
 
-    sock = init_socket(args->s_type);
+    sock = init_socket(args);
 
     if (sock < 0) {
         fprintf(stderr, "[Error] Socket creation failed %s\n", strerror(errno));
@@ -42,19 +49,25 @@ static int scan_single_tcp_port(const Args *args, uint16_t port)
     return conn;
 }
 
-static int scan_range_port(const Args *args, int *open_port, int *count)
+static int scan_range_port(const Args *args, StatusPort *open_port, int *count)
 {
-    if (!is_valid_port(args->min_port) || !is_valid_port(args->max_port)) {
+    if (!is_valid_range_port(args->min_port, args->max_port)) {
         return -1;
     }
 
-    for (int i = 0, port = args->min_port; port < args->max_port; port++) {
+    for (int i = 0, port = args->min_port; port < args->max_port; port++, i++, (*count)++) {
         if (scan_single_tcp_port(args, port) < 0) {
-            return -1;
+            if (errno == ETIMEDOUT)
+                open_port[i].status = 1;
+            else if (errno == ECONNREFUSED)
+                continue;
+            else
+                return -1;
+        } else {
+            open_port[i].status = 0;
         }
 
-        open_port[i] = port;
-        (*count)++;
+        open_port[i].port = port;
     }
 
     return 0;
@@ -63,22 +76,30 @@ static int scan_range_port(const Args *args, int *open_port, int *count)
 int handle_scan(const Args *args)
 {
     if (args->flags & SCAN_RANGE) {
-        int *open_port = (int *)malloc(65535);
+        StatusPort *open_port = malloc(65535 * sizeof(StatusPort));
+        // int *open_port = (int *)malloc(65535);
         memset(open_port, 0, sizeof(*open_port));
         int count = 0;
 
-        int state = scan_range_port(args, open_port, &count);
-        if (state < 0) {
-            return state;
+        if (scan_range_port(args, open_port, &count) < 0) {
+            return -1;
         }
 
         for (int i = 0; i < count; i++) {
-            int port = open_port[i];
-            if (port != 0) {
-                printf("Port %d is open", port);
+            int port = open_port[i].port;
+            int status = open_port[i].status;
+
+            if (port > 0) {
+                if (status == 0)
+                    printf("Port %d is open\n", port);
+                // else if (status == 1)
+                //     printf("Port %d is closed\n", args->port);
+                else if (status == 1)
+                    printf("Port %d is filtered\n", port);
             }
         }
-        return state;
+        SAFE_FREE(open_port);
+        return 0;
     }
 
     if (args->port) {
@@ -89,7 +110,8 @@ int handle_scan(const Args *args)
             else if (errno == ETIMEDOUT)
                 printf("Port %d is filtered\n", args->port);
             else {
-                fprintf(stderr, "Port %d error: %s", args->port, strerror(errno));
+                fprintf(stderr, "Port %d error: %s", args->port,
+                        strerror(errno));
                 return -1;
             }
 

@@ -69,7 +69,7 @@ static int parse_port_range(const char *str, Args *args)
     unsigned long min = strtoul(min_str, NULL, 10);
     unsigned long max = strtoul(max_str, NULL, 10);
 
-    if (!is_valid_port(min) || !is_valid_port(max) || min > max) {
+    if (!is_valid_range_port(min, max)) {
         fprintf(stderr, "[Error] Invalid port range '%s'\n", str);
         goto cleanup;
     }
@@ -121,7 +121,7 @@ int parse_args(int argc, char **argv, Args *args)
             break;
         case 't': {
             unsigned long timeout = strtoul(optarg, NULL, 10);
-            if (timeout < 1 || timeout > 200) {
+            if (!is_valid_timeout(timeout)) {
                 fprintf(stderr, "[Error] Timeout value must be between 1 and 200\n");
                 return -1;
             }
