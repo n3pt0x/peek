@@ -1,6 +1,8 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-int init_socket(int type);
+#include "args.h"
+
+int init_socket(const Args *args);
 
 #endif /* SOCKET_H */
