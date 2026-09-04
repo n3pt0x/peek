@@ -17,6 +17,7 @@
 static inline bool is_valid_port(int port) { return port > 0 && port <= 65535; }
 static inline bool is_valid_range_port(int min_port, int max_port) { return is_valid_port(min_port) && is_valid_port(max_port) && min_port < max_port; }
 static inline bool is_valid_timeout(int timeout) { return timeout > 1 && timeout < 200; }
+static inline bool is_valid_ttl(int ttl) { return ttl > 1 && ttl <= 255; }
 
 bool is_valid_ip(const char *ip);
 

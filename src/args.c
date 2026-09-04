@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <bits/getopt_core.h>
 #include <getopt.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -15,6 +16,8 @@
 static const struct option long_options[] = {
     {"port", required_argument, 0, 'p'},
     {"udp", no_argument, 0, 'u'},
+    {"icmp", no_argument, 0, 'i'},
+    {"ttl", required_argument, 0, 'l'},
     {"timeout", required_argument, 0, 't'},
     {"verbose", no_argument, 0, 'v'},
     {"help", no_argument, 0, 'h'},
@@ -105,20 +108,37 @@ int parse_args(int argc, char **argv, Args *args)
     // Default value
     memset(args, 0, sizeof(Args));
     args->s_type = SOCK_STREAM;
+    args->flags |= SCAN_NETWORK;
 
     int opt;
     int option_index = 0;
 
-    while ((opt = getopt_long(argc, argv, "p:u::t:vh", long_options,
-                              &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "p:u::i::l:t:vh", long_options, &option_index)) != -1) {
         switch (opt) {
         case 'p':
             if (parse_port(optarg, args) != 0)
                 return -1;
             break;
         case 'u':
+            args->flags |= SCAN_NETWORK;
             args->s_type = SOCK_DGRAM;
             break;
+        case 'i':
+            /* Disable default scan (TCP) */
+            args->s_type = 0;
+            args->flags =~ SCAN_NETWORK;
+            
+            args->flags |= SCAN_ICMP;
+            break;
+        case 'l': {
+                int ttl = *(int*)optarg;
+                if(!is_valid_ttl(ttl)) {
+                    fprintf(stderr, "[Error] TTL value must be between 1 and 255\n");
+                    return -1;
+                }
+                args->ttl = ttl;
+                break;
+            }
         case 't': {
             unsigned long timeout = strtoul(optarg, NULL, 10);
             if (!is_valid_timeout(timeout)) {
