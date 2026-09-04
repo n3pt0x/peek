@@ -1,6 +1,7 @@
 #ifndef ICMP_H
 #define ICMP_H
 
+#include <netinet/in.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/socket.h>
@@ -12,8 +13,8 @@ typedef struct EchoRequest {
     int sock;
     uint8_t ttl;
     int timeout;
-    const char *addr;
-    size_t addr_len;
+    struct sockaddr_storage addr;
+    socklen_t addr_len;
 } EchoRequest;
 
 int icmp_create_sock(EchoRequest *req);
