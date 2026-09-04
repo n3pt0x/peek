@@ -1,5 +1,6 @@
 #include "scan.h"
 #include "flags.h"
+#include "scan/icmp.h"
 #include "scan/tcp.h"
 #include "utils.h"
 #include <errno.h>
@@ -58,10 +59,41 @@ static int handle_tcp_scan(const Args *args)
     return -1;
 }
 
+static int handle_icmp(const Args *args)
+{
+    uint8_t packet[1024];
+    size_t packet_len;
+    EchoRequest req = {0};
+    strncpy(req.target, args->ip, sizeof(req.target) - 1);
+
+    if (icmp_create_sock(&req) < 0) {
+        fprintf(stderr, "[Error] Failed tro create ICMP socket: %s\n", strerror(errno));
+        return -1;
+    }
+
+    if (args->ttl)
+        if (icmp_set_ttl(&req, args->ttl) < 0)
+            return -1;
+
+    if (args->timeout)
+        if (icmp_set_timeout(&req, args->timeout * 1000) < 0)
+            return -1;
+
+    if (icmp_build_echo(&req, packet, &packet_len, 56) < 0)
+        return -1;
+
+    if (icmp_send_packet(&req, packet, packet_len) < 0)
+        return -1;
+
+    return 0;
+}
+
 int handle_scan(const Args *args)
 {
     if (args->s_type == SOCK_STREAM) {
         return handle_tcp_scan(args);
+    } else if (args->flags & SCAN_ICMP) {
+        return handle_icmp(args);
     } else {
         // Comming Soon;
     }
