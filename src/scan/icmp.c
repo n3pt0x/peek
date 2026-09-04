@@ -48,7 +48,7 @@ static int dns_lookup(EchoRequest *req)
 
 int icmp_create_sock(EchoRequest *req)
 {
-    req->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+    req->sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 
     if (req->sock < 0) {
         return -1;
@@ -116,7 +116,7 @@ int icmp_build_echo(EchoRequest *req, uint8_t *packet, size_t *packet_len,
     }
 
     *packet_len = ICMP_HEADER_LEN + payload_len;
-    header->checksum = checksum(packet, *packet_len);
+    header->checksum = htons(checksum(packet, *packet_len));
 
     int status = dns_lookup(req);
     if (status != 0) {
