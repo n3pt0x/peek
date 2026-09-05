@@ -31,8 +31,8 @@ int scan_single_tcp_port(const Args *args, uint16_t port)
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-    if (inet_pton(AF_INET, args->ip, &(addr.sin_addr)) <= 0) {
-        fprintf(stderr, "[Error] IP adress is invalid: %s\n", args->ip);
+    if (inet_pton(AF_INET, args->target, &(addr.sin_addr)) <= 0) {
+        fprintf(stderr, "[Error] IP adress is invalid: %s\n", args->target);
         return -1;
     }
 

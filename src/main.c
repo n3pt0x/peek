@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <unistd.h>
 
 int main(int argc, char **argv)
@@ -13,6 +14,8 @@ int main(int argc, char **argv)
         printf("Usage: %s <ip> -p <port>\n", argv[0]);
         return 1;
     }
+
+    srand(time(NULL));
 
     int ret = EXIT_FAILURE;
 

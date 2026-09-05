@@ -5,7 +5,7 @@
 
 typedef struct Args {
     int s_type;
-    char *ip;
+    char *target;
     uint16_t port;
     uint16_t min_port;
     uint16_t max_port;

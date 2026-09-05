@@ -66,7 +66,7 @@ static int handle_icmp(const Args *args)
     size_t payload_len = 56;
     EchoRequest req = {0};
     req.sequence = 1;
-    strncpy(req.target, args->ip, sizeof(req.target) - 1);
+    strncpy(req.target, args->target, sizeof(req.target) - 1);
 
     if (icmp_create_sock(&req) < 0) {
         fprintf(stderr, "[Error] Failed tro create ICMP socket: %s\n", strerror(errno));

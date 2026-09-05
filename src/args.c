@@ -27,7 +27,7 @@ static const struct option long_options[] = {
 static bool parse_ip(const char *ip, Args *args)
 {
     if (is_valid_ip(ip)) {
-        args->ip = strdup(ip);
+        args->target = strdup(ip);
         return true;
     }
 
@@ -163,8 +163,8 @@ int parse_args(int argc, char **argv, Args *args)
 
 void debug_args(const Args *args)
 {
-    if (args->ip)
-        printf("%s\n", args->ip);
+    if (args->target)
+        printf("%s\n", args->target);
 
     if (args->min_port && args->max_port) {
         printf("%i\n", args->min_port);
@@ -181,8 +181,8 @@ void debug_args(const Args *args)
 
 void free_args(Args *args)
 {
-    if (args->ip) {
-        free(args->ip);
-        args->ip = NULL;
+    if (args->target) {
+        free(args->target);
+        args->target = NULL;
     }
 }
