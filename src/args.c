@@ -1,6 +1,6 @@
 #include "args.h"
-#include "flags.h"
-#include "utils.h"
+#include "utils/flags.h"
+#include "utils/utils.h"
 #include <arpa/inet.h>
 #include <bits/getopt_core.h>
 #include <getopt.h>

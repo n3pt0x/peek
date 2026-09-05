@@ -1,9 +1,9 @@
-#include "scan.h"
-#include "flags.h"
-#include "scan/common.h"
-#include "scan/icmp.h"
-#include "scan/tcp.h"
+#include "scanner.h"
+#include "protocols/icmp.h"
+#include "protocols/tcp.h"
 #include "utils.h"
+#include "utils/flags.h"
+#include "utils/utils.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +45,7 @@ static int handle_tcp_scan(const Args *args)
             else if (errno == ETIMEDOUT)
                 printf("Port %d is filtered\n", args->port);
             else {
-                fprintf(stderr, "Port %d error: %s", args->port,
+                fprintf(stderr, "Port %d error: %s\n", args->port,
                         strerror(errno));
                 return -1;
             }
@@ -80,7 +80,7 @@ static int handle_icmp(const Args *args)
         if (icmp_set_timeout(&req, args->timeout) < 0)
             return -1;
     } else {
-        if (icmp_set_timeout(&req, 10) < 0)
+        if (icmp_set_timeout(&req, 3 * 1000) < 0)
             return -1;
     }
 

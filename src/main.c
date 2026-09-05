@@ -1,5 +1,5 @@
 #include "args.h"
-#include "scan.h"
+#include "scanner/scanner.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>

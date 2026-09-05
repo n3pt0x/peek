@@ -1,6 +1,6 @@
 #include "icmp.h"
 #include "common.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include <arpa/inet.h>
 #include <asm-generic/socket.h>
 #include <bits/types/struct_timeval.h>
@@ -67,7 +67,7 @@ int icmp_set_timeout(EchoRequest *req, int timeout_ms)
     }
 
     if (!is_valid_timeout(timeout_ms)) {
-        fprintf(stderr, "[Error] Timeout must be between 1 and 200 seconds");
+        fprintf(stderr, "[Error] Timeout must be between 1 and 200 seconds\n");
         return -1;
     }
 
@@ -88,7 +88,7 @@ int icmp_set_ttl(EchoRequest *req, int ttl)
     }
 
     if (!is_valid_ttl(ttl)) {
-        fprintf(stderr, "[Error] TTL must be between 1 and 255");
+        fprintf(stderr, "[Error] TTL must be between 1 and 255\n");
         return -1;
     }
 

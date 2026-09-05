@@ -1,6 +1,6 @@
 #include "tcp.h"
-#include "socket.h"
-#include "utils.h"
+#include "net/socket.h"
+#include "utils/utils.h"
 #include <arpa/inet.h>
 #include <asm-generic/errno.h>
 #include <errno.h>
