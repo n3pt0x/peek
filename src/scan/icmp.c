@@ -60,20 +60,20 @@ int icmp_create_sock(EchoRequest *req)
     return 0;
 }
 
-int icmp_set_timeout(EchoRequest *req, int timeout)
+int icmp_set_timeout(EchoRequest *req, int timeout_ms)
 {
     if (req->sock < 0) {
         return -1;
     }
 
-    if (!is_valid_timeout(timeout)) {
+    if (!is_valid_timeout(timeout_ms)) {
         fprintf(stderr, "[Error] Timeout must be between 1 and 200 seconds");
         return -1;
     }
 
-    req->timeout = timeout;
+    req->timeout_ms = timeout_ms;
 
-    struct timeval tv = ms_to_timeval(req->timeout);
+    struct timeval tv = ms_to_timeval(req->timeout_ms);
     if (setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         return -1;
     }
@@ -162,7 +162,7 @@ int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len)
 
     if (n < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return 0;
+            return 1;
         }
         fprintf(stderr, "[Error] Recv echo request has failed: %s\n", strerror(errno));
         return -1;
@@ -179,8 +179,6 @@ int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len)
         fprintf(stderr, "[Error] Not a Echo Request type (type=%d)\n", reply->type);
         return -1;
     }
-    
-    printf("Host %s is up\n", req->target);
 
     return 0;
 }

@@ -14,7 +14,7 @@ typedef struct EchoRequest {
     char target[256];
     int sock;
     uint8_t ttl;
-    int timeout;
+    int timeout_ms;
     int sequence;
     struct sockaddr_storage addr;
     socklen_t addr_len;

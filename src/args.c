@@ -140,7 +140,7 @@ int parse_args(int argc, char **argv, Args *args)
             break;
         }
         case 't': {
-            unsigned long timeout = strtoul(optarg, NULL, 10);
+            unsigned long timeout = strtoul(optarg, NULL, 10) * 1000; // Convert to MS
             if (!is_valid_timeout(timeout)) {
                 fprintf(stderr, "[Error] Timeout value must be between 1 and 200\n");
                 return -1;
