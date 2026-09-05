@@ -131,14 +131,14 @@ int parse_args(int argc, char **argv, Args *args)
             args->flags |= SCAN_ICMP;
             break;
         case 'l': {
-                int ttl = *(int*)optarg;
-                if(!is_valid_ttl(ttl)) {
-                    fprintf(stderr, "[Error] TTL value must be between 1 and 255\n");
-                    return -1;
-                }
-                args->ttl = ttl;
-                break;
+            int ttl = atoi(optarg);
+            if(!is_valid_ttl(ttl)) {
+                fprintf(stderr, "[Error] TTL value must be between 1 and 255\n");
+                return -1;
             }
+            args->ttl = ttl;
+            break;
+        }
         case 't': {
             unsigned long timeout = strtoul(optarg, NULL, 10);
             if (!is_valid_timeout(timeout)) {
