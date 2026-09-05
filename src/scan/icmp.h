@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <sys/socket.h>
 
+#define ICMP_ECHO_REPLY 0x0
+#define ICMP_ECHO_REQUEST 0x8
 #define ICMP_HEADER_LEN 8
 
 typedef struct EchoRequest {
@@ -13,6 +15,7 @@ typedef struct EchoRequest {
     int sock;
     uint8_t ttl;
     int timeout;
+    int sequence;
     struct sockaddr_storage addr;
     socklen_t addr_len;
 } EchoRequest;
@@ -22,5 +25,6 @@ int icmp_set_timeout(EchoRequest *req, int timeout);
 int icmp_set_ttl(EchoRequest *req, int ttl);
 int icmp_build_echo(EchoRequest *req, uint8_t *packet, size_t *packet_len, size_t payload_len);
 int icmp_send_packet(const EchoRequest *req, uint8_t *packet, size_t packet_len);
+int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len);
 
 #endif /* ICMP_H */

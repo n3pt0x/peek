@@ -61,9 +61,11 @@ static int handle_tcp_scan(const Args *args)
 
 static int handle_icmp(const Args *args)
 {
-    uint8_t packet[1024];
+    uint8_t packet[1024], response[1024];
     size_t packet_len;
+    size_t payload_len = 56;
     EchoRequest req = {0};
+    req.sequence = 1;
     strncpy(req.target, args->ip, sizeof(req.target) - 1);
 
     if (icmp_create_sock(&req) < 0) {
@@ -79,12 +81,17 @@ static int handle_icmp(const Args *args)
         if (icmp_set_timeout(&req, args->timeout * 1000) < 0)
             return -1;
 
-    if (icmp_build_echo(&req, packet, &packet_len, 56) < 0)
+    if (icmp_build_echo(&req, packet, &packet_len, payload_len) < 0)
         return -1;
 
     if (icmp_send_packet(&req, packet, packet_len) < 0)
         return -1;
 
+    if (icmp_recv_reply(&req, response, sizeof(response)) < 0)
+        return -1;
+
+    
+    
     return 0;
 }
 
