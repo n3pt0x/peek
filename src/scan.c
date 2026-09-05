@@ -1,5 +1,6 @@
 #include "scan.h"
 #include "flags.h"
+#include "scan/common.h"
 #include "scan/icmp.h"
 #include "scan/tcp.h"
 #include "utils.h"
@@ -68,30 +69,45 @@ static int handle_icmp(const Args *args)
     req.sequence = 1;
     strncpy(req.target, args->target, sizeof(req.target) - 1);
 
+    /* Socket Config*/
     if (icmp_create_sock(&req) < 0) {
-        fprintf(stderr, "[Error] Failed tro create ICMP socket: %s\n", strerror(errno));
+        fprintf(stderr, "[Error] Failed tro create ICMP socket: %s\n",
+                strerror(errno));
         return -1;
+    }
+
+    if (args->timeout) {
+        if (icmp_set_timeout(&req, args->timeout) < 0)
+            return -1;
+    } else {
+        if (icmp_set_timeout(&req, 10) < 0)
+            return -1;
     }
 
     if (args->ttl)
         if (icmp_set_ttl(&req, args->ttl) < 0)
             return -1;
 
-    if (args->timeout)
-        if (icmp_set_timeout(&req, args->timeout * 1000) < 0)
-            return -1;
-
+    /* Build Packet */
     if (icmp_build_echo(&req, packet, &packet_len, payload_len) < 0)
         return -1;
 
+    /* Send Packet */
     if (icmp_send_packet(&req, packet, packet_len) < 0)
         return -1;
 
-    if (icmp_recv_reply(&req, response, sizeof(response)) < 0)
+    /* Handle response */
+    int state = icmp_recv_reply(&req, response, sizeof(response));
+    if (state < 0) {
         return -1;
+    } else {
+        if (state == 0) {
+            printf("Host %s is up\n", req.target);
+        } else if (state == 1) {
+            printf("Host %s is down\n", req.target);
+        }
+    }
 
-    
-    
     return 0;
 }
 
