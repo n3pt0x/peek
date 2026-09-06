@@ -1,11 +1,5 @@
 #include "socket.h"
-#include "args.h"
-#include <arpa/inet.h>
-#include <asm-generic/socket.h>
-#include <bits/types/struct_timeval.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
-#include <unistd.h>
 
 int init_socket(const Args *args)
 {

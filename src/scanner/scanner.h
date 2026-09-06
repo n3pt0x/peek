@@ -1,7 +1,7 @@
 #ifndef SCAN_H
 #define SCAN_H
 
-#include "args.h"
+#include "common/common.h"
 
 int handle_scan(const Args *args);
 

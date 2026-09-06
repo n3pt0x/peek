@@ -1,18 +1,7 @@
 #ifndef ARGS_H
 #define ARGS_H
 
-#include <stdint.h>
-
-typedef struct Args {
-    int s_type;
-    char *target;
-    uint16_t port;
-    uint16_t min_port;
-    uint16_t max_port;
-    int timeout;
-    int ttl;
-    uint32_t flags;
-} Args;
+#include "common/common.h"
 
 int parse_args(int argc, char **argv, Args *args);
 void debug_args(const Args *args);

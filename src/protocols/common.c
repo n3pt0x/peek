@@ -1,6 +1,4 @@
 #include "common.h"
-#include <stddef.h>
-#include <stdint.h>
 
 uint16_t checksum(const uint8_t *data, size_t data_len)
 {

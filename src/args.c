@@ -1,17 +1,10 @@
 #include "args.h"
-#include "utils/flags.h"
+#include "common/flags.h"
 #include "utils/utils.h"
-#include <arpa/inet.h>
-#include <bits/getopt_core.h>
 #include <getopt.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 
 static const struct option long_options[] = {
     {"port", required_argument, 0, 'p'},

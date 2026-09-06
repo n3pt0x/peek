@@ -1,8 +1,5 @@
 #include "icmp.h"
-#include "common.h"
 #include "utils/utils.h"
-#include <arpa/inet.h>
-#include <asm-generic/socket.h>
 #include <errno.h>
 #include <netdb.h>
 #include <stdint.h>

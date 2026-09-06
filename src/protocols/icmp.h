@@ -1,8 +1,6 @@
 #ifndef ICMP_H
 #define ICMP_H
 
-#include <netinet/in.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <sys/socket.h>
 

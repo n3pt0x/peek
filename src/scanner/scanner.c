@@ -1,13 +1,10 @@
 #include "scanner.h"
+#include "common/flags.h"
+#include "common/config.h"
 #include "protocols/icmp.h"
 #include "protocols/tcp.h"
 #include "utils.h"
-#include "utils/flags.h"
 #include "utils/utils.h"
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 static int handle_tcp_scan(const Args *args)
 {
@@ -80,7 +77,7 @@ static int handle_icmp(const Args *args)
         if (icmp_set_timeout(&req, args->timeout) < 0)
             return -1;
     } else {
-        if (icmp_set_timeout(&req, 3 * 1000) < 0)
+        if (icmp_set_timeout(&req, DEFAULT_TIMEMOUT_MS) < 0)
             return -1;
     }
 
