@@ -1,7 +1,7 @@
 #ifndef ARGS_H
 #define ARGS_H
 
-#include "common/common.h"
+#include "peek.h"
 
 int parse_args(int argc, char **argv, Args *args);
 void debug_args(const Args *args);

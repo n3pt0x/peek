@@ -22,7 +22,7 @@ int scan_single_tcp_port(const Args *args, uint16_t port)
         return -1;
     }
 
-    sock = init_socket(args);
+    sock = socket_create(args->s_type, 0);
 
     if (sock < 0) {
         fprintf(stderr, "[Error] Socket creation failed %s\n", strerror(errno));

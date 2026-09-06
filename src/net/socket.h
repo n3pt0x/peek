@@ -1,8 +1,10 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#include "common/common.h"
+#include <unistd.h>
 
-int init_socket(const Args *args);
+int socket_create(int type, int protocol);
+int socket_set_timeout(int *sock, int timeout_ms);
+int socket_set_ttl(int *sock, int ttl);
 
 #endif /* SOCKET_H */

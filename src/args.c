@@ -1,5 +1,4 @@
 #include "args.h"
-#include "common/flags.h"
 #include "utils/utils.h"
 #include <getopt.h>
 #include <stdio.h>

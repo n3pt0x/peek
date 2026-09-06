@@ -1,18 +1,58 @@
 #include "socket.h"
+#include "utils/utils.h"
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 
-int init_socket(const Args *args)
+int socket_create(int type, int protocol)
 {
     int sock;
-    sock = socket(AF_INET, args->s_type, 0);
+    sock = socket(AF_INET, type, protocol);
 
     if (sock < 0) {
         return -1;
     }
 
-    struct timeval tv = {.tv_sec = args->timeout, .tv_usec = 0};
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
-
     return sock;
+}
+
+int socket_set_timeout(int *sock, int timeout_ms)
+{
+    if (*sock < 0) {
+        return -1;
+    }
+
+    if (!is_valid_timeout(timeout_ms)) {
+        fprintf(stderr, "[Error] Timeout must be between 1 and 200 seconds\n");
+        return -1;
+    }
+
+    struct timeval tv = ms_to_timeval(timeout_ms);
+    if (setsockopt(*sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        fprintf(stderr, "[Error] Timeout SO_RCVTIMEO failed: %s\n", strerror(errno));
+        return -1;
+    }
+
+    if (setsockopt(*sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0) {
+        fprintf(stderr, "[Error] Timeout SO_SNDTIMEO failed: %s\n", strerror(errno));
+        return -1;
+    }
+
+    return 0;
+}
+
+int socket_set_ttl(int *sock, int ttl)
+{
+    if (*sock < 0) {
+        return -1;
+    }
+
+    if (!is_valid_ttl(ttl)) {
+        fprintf(stderr, "[Error] TTL must be between 1 and 255\n");
+        return -1;
+    }
+
+    return setsockopt(*sock, IPPROTO_ICMP, IP_TTL, (const void *)&ttl,
+                      sizeof(ttl));
 }

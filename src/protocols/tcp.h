@@ -1,7 +1,7 @@
 #ifndef TCP_H
 #define TCP_H
 
-#include "args.h"
+#include "peek.h"
 #include <stdint.h>
 
 typedef struct StatusPort {

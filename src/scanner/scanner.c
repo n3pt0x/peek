@@ -1,6 +1,6 @@
 #include "scanner.h"
-#include "common/flags.h"
-#include "common/config.h"
+#include "net/socket.h"
+#include "peek.h"
 #include "protocols/icmp.h"
 #include "protocols/tcp.h"
 #include "utils.h"
@@ -67,22 +67,22 @@ static int handle_icmp(const Args *args)
     strncpy(req.target, args->target, sizeof(req.target) - 1);
 
     /* Socket Config*/
-    if (icmp_create_sock(&req) < 0) {
+    if ((req.sock = socket_create(SOCK_DGRAM, IPPROTO_ICMP)) < 0) {
         fprintf(stderr, "[Error] Failed tro create ICMP socket: %s\n",
                 strerror(errno));
         return -1;
     }
 
     if (args->timeout) {
-        if (icmp_set_timeout(&req, args->timeout) < 0)
+        if (socket_set_timeout(&req.sock, args->timeout) < 0)
             return -1;
     } else {
-        if (icmp_set_timeout(&req, DEFAULT_TIMEMOUT_MS) < 0)
+        if (socket_set_timeout(&req.sock, DEFAULT_TIMEMOUT_MS) < 0)
             return -1;
     }
 
     if (args->ttl)
-        if (icmp_set_ttl(&req, args->ttl) < 0)
+        if (socket_set_ttl(&req.sock, args->ttl) < 0)
             return -1;
 
     /* Build Packet */

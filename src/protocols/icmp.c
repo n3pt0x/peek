@@ -1,5 +1,4 @@
 #include "icmp.h"
-#include "utils/utils.h"
 #include <errno.h>
 #include <netdb.h>
 #include <stdint.h>
@@ -40,57 +39,8 @@ static int dns_lookup(EchoRequest *req)
     return 0;
 }
 
-
-int icmp_create_sock(EchoRequest *req)
-{
-    req->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
-
-    if (req->sock < 0) {
-        return -1;
-    }
-
-    return 0;
-}
-
-int icmp_set_timeout(EchoRequest *req, int timeout_ms)
-{
-    if (req->sock < 0) {
-        return -1;
-    }
-
-    if (!is_valid_timeout(timeout_ms)) {
-        fprintf(stderr, "[Error] Timeout must be between 1 and 200 seconds\n");
-        return -1;
-    }
-
-    req->timeout_ms = timeout_ms;
-
-    struct timeval tv = ms_to_timeval(req->timeout_ms);
-    if (setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        perror("setsockopt");
-        return -1;
-    }
-
-    return 0;
-}
-
-int icmp_set_ttl(EchoRequest *req, int ttl)
-{
-    if (req->sock < 0) {
-        return -1;
-    }
-
-    if (!is_valid_ttl(ttl)) {
-        fprintf(stderr, "[Error] TTL must be between 1 and 255\n");
-        return -1;
-    }
-
-    req->ttl = ttl;
-    return setsockopt(req->sock, IPPROTO_ICMP, IP_TTL, (const void *)&req->ttl,
-                      sizeof(req->ttl));
-}
-
-int icmp_build_echo(EchoRequest *req, uint8_t *packet, size_t *packet_len, size_t payload_len)
+int icmp_build_echo(EchoRequest *req, uint8_t *packet, size_t *packet_len,
+                    size_t payload_len)
 {
     if (!packet) {
         return -1;
@@ -129,7 +79,7 @@ int icmp_send_packet(const EchoRequest *req, uint8_t *packet, size_t packet_len)
     }
 
     ssize_t n = sendto(req->sock, packet, packet_len, 0,
-                          (const struct sockaddr *)&req->addr, req->addr_len);
+                       (const struct sockaddr *)&req->addr, req->addr_len);
 
     if (n < 0) {
         perror("sendto");
@@ -150,7 +100,8 @@ static int recv_parser(ssize_t n, uint8_t *buffer)
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             return 1;
         }
-        fprintf(stderr, "[Error] Recv echo request has failed: %s\n", strerror(errno));
+        fprintf(stderr, "[Error] Recv echo request has failed: %s\n",
+                strerror(errno));
         return -1;
     }
 
@@ -162,7 +113,8 @@ static int recv_parser(ssize_t n, uint8_t *buffer)
     struct icmphdr *reply = (struct icmphdr *)buffer;
 
     if (reply->type != ICMP_ECHO_REPLY) {
-        fprintf(stderr, "[Error] Not a Echo Request type (type=%d)\n", reply->type);
+        fprintf(stderr, "[Error] Not a Echo Request type (type=%d)\n",
+                reply->type);
         return -1;
     }
 
@@ -176,7 +128,8 @@ int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len)
     struct sockaddr_storage src_addr;
     socklen_t src_addr_len = sizeof(src_addr);
 
-    ssize_t n = recvfrom(req->sock, buffer, buffer_len - 1, 0, (struct sockaddr *)&src_addr, &src_addr_len);
+    ssize_t n = recvfrom(req->sock, buffer, buffer_len - 1, 0,
+                         (struct sockaddr *)&src_addr, &src_addr_len);
 
     return recv_parser(n, buffer);
 }

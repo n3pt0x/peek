@@ -1,7 +1,7 @@
 #ifndef SCAN_H
 #define SCAN_H
 
-#include "common/common.h"
+#include "peek.h"
 
 int handle_scan(const Args *args);
 
