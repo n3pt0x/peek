@@ -104,7 +104,7 @@ static int handle_icmp(const Args *args)
         if (state == 0) {
             printf("Host %s is up\n", req.target);
         } else if (state == 1) {
-            printf("Host %s is down\n", req.target);
+            printf("Host %s is down (unreachable)\n", req.target);
         }
     }
 

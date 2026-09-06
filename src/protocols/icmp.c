@@ -5,6 +5,7 @@
 #include <asm-generic/socket.h>
 #include <errno.h>
 #include <netdb.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -146,15 +147,8 @@ int icmp_send_packet(const EchoRequest *req, uint8_t *packet, size_t packet_len)
     return 0;
 }
 
-int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len)
+static int recv_parser(ssize_t n, uint8_t *buffer)
 {
-    memset(buffer, 0, buffer_len);
-
-    struct sockaddr_storage src_addr;
-    socklen_t src_addr_len = sizeof(src_addr);
-
-    ssize_t n = recvfrom(req->sock, buffer, buffer_len - 1, 0, (struct sockaddr *)&src_addr, &src_addr_len);
-
     if (n < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             return 1;
@@ -176,4 +170,16 @@ int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len)
     }
 
     return 0;
+}
+
+int icmp_recv_reply(EchoRequest *req, uint8_t *buffer, size_t buffer_len)
+{
+    memset(buffer, 0, buffer_len);
+
+    struct sockaddr_storage src_addr;
+    socklen_t src_addr_len = sizeof(src_addr);
+
+    ssize_t n = recvfrom(req->sock, buffer, buffer_len - 1, 0, (struct sockaddr *)&src_addr, &src_addr_len);
+
+    return recv_parser(n, buffer);
 }
