@@ -3,19 +3,13 @@
 #include "utils/utils.h"
 #include <arpa/inet.h>
 #include <asm-generic/socket.h>
-#include <bits/types/struct_timeval.h>
 #include <errno.h>
 #include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <time.h>
 #include <unistd.h>
 
 struct icmphdr {
@@ -75,6 +69,7 @@ int icmp_set_timeout(EchoRequest *req, int timeout_ms)
 
     struct timeval tv = ms_to_timeval(req->timeout_ms);
     if (setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        perror("setsockopt");
         return -1;
     }
 
@@ -135,16 +130,16 @@ int icmp_send_packet(const EchoRequest *req, uint8_t *packet, size_t packet_len)
         return -1;
     }
 
-    ssize_t sent = sendto(req->sock, packet, packet_len, 0,
+    ssize_t n = sendto(req->sock, packet, packet_len, 0,
                           (const struct sockaddr *)&req->addr, req->addr_len);
 
-    if (sent < 0) {
+    if (n < 0) {
         perror("sendto");
         return -1;
     }
 
-    if (sent != (ssize_t)packet_len) {
-        fprintf(stderr, "[Error] Sent %zd bytes, expected %zd", sent, packet_len);
+    if (n != (ssize_t)packet_len) {
+        fprintf(stderr, "[Error] Sent %zd bytes, expected %zd", n, packet_len);
         return -1;
     }
 
