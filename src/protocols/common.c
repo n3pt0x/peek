@@ -1,4 +1,7 @@
 #include "common.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 uint16_t checksum(const uint8_t *data, size_t data_len)
 {
@@ -24,4 +27,12 @@ uint16_t checksum(const uint8_t *data, size_t data_len)
     }
 
     return (uint16_t)~sum;
+}
+
+void generate_random_data(void *packet, size_t packet_len)
+{
+    uint8_t *data = packet;
+    for (size_t i = 0; i < packet_len; i++) {
+        data[i] = rand() % 256;
+    }
 }
