@@ -5,10 +5,10 @@
 #include <string.h>
 #include <sys/socket.h>
 
-int socket_create(int type, int protocol)
+int socket_create(int domain, int type, int protocol)
 {
     int sock;
-    sock = socket(AF_INET, type, protocol);
+    sock = socket(domain, type, protocol);
 
     if (sock < 0) {
         return -1;
