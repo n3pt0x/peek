@@ -1,4 +1,5 @@
 #include "args.h"
+#include "peek.h"
 #include "utils/utils.h"
 #include <getopt.h>
 #include <stdio.h>
@@ -112,6 +113,7 @@ int parse_args(int argc, char **argv, Args *args)
                 return -1;
             break;
         case 'u':
+            args->flags |= SCAN_UDP;
             args->flags |= SCAN_NETWORK;
             args->s_type = SOCK_DGRAM;
             break;

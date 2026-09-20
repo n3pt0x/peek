@@ -3,8 +3,24 @@
 #include "peek.h"
 #include "protocols/icmp.h"
 #include "protocols/tcp.h"
+#include "protocols/udp.h"
 #include "utils.h"
 #include "utils/utils.h"
+#include <stdio.h>
+#include <string.h>
+
+static int set_timeout(int *socket, int timeout)
+{
+    if (timeout) {
+        if (socket_set_timeout(socket, timeout) < 0)
+            return -1;
+    } else {
+        if (socket_set_timeout(socket, DEFAULT_TIMEMOUT_MS) < 0)
+            return -1;
+    }
+
+    return 0;
+}
 
 static int handle_tcp_scan(const Args *args)
 {
@@ -57,7 +73,35 @@ static int handle_tcp_scan(const Args *args)
     return -1;
 }
 
-static int handle_icmp(const Args *args)
+static int handle_udp_scan(const Args *args)
+{
+    int sock = udp_create_socket();
+    if (sock < 0) {
+        fprintf(stderr, "[Error] socket: %s\n", strerror(errno));
+        return -1;
+    }
+
+    if (set_timeout(&sock, args->timeout) < 0) {
+        close(sock);
+        return -1;
+    }
+
+    int state = udp_connect_scan(sock, args->target, args->port);
+
+    close(sock);
+
+    if (state == 0)
+        printf("Port %d is open\n", args->port);
+    else if (state == ECONNREFUSED || state == ETIMEDOUT)
+        printf("Port %d is filtered\n", args->port);
+    else {
+        printf("Port %d is closed\n", args->port);
+    }
+
+    return 0;
+}
+
+static int handle_icmp_scan(const Args *args)
 {
     uint8_t packet[1024], response[1024];
     size_t packet_len;
@@ -67,7 +111,7 @@ static int handle_icmp(const Args *args)
     strncpy(req.target, args->target, sizeof(req.target) - 1);
 
     /* Socket Config*/
-    if ((req.sock = socket_create(SOCK_DGRAM, IPPROTO_ICMP)) < 0) {
+    if ((req.sock = socket_create(AF_INET, SOCK_DGRAM, IPPROTO_ICMP)) < 0) {
         fprintf(stderr, "[Error] Failed tro create ICMP socket: %s\n",
                 strerror(errno));
         return -1;
@@ -113,9 +157,9 @@ int handle_scan(const Args *args)
     if (args->s_type == SOCK_STREAM) {
         return handle_tcp_scan(args);
     } else if (args->flags & SCAN_ICMP) {
-        return handle_icmp(args);
-    } else {
-        // Comming Soon;
+        return handle_icmp_scan(args);
+    } else if (args->flags & SCAN_UDP) {
+        return handle_udp_scan(args);
     }
 
     return -1;
