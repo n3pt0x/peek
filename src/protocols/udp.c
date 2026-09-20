@@ -44,8 +44,8 @@ int udp_connect_scan(int sock, const char *target, uint16_t port)
     uint8_t msg[128];
     generate_random_data(msg, sizeof(msg));
 
-    if (sendto(sock, msg, sizeof(msg), 0, (struct sockaddr *)&addr,
-               addr_len) < 0) {
+    if (sendto(sock, msg, sizeof(msg), 0, (struct sockaddr *)&addr, addr_len) <
+        0) {
         fprintf(stderr, "[Error] sendto failed: %s\n", strerror(errno));
         return -1;
     }
@@ -55,9 +55,10 @@ int udp_connect_scan(int sock, const char *target, uint16_t port)
                          (struct sockaddr *)&addr, &addr_len);
 
     if (n < 0) {
-        if (errno == ECONNREFUSED) {
-            return errno;
-        }
+        if (errno == ECONNREFUSED)
+            return ECONNREFUSED;
+        else if (errno == EAGAIN)
+            return EAGAIN;
 
         return -1;
     }

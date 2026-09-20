@@ -6,6 +6,7 @@
 #include "protocols/udp.h"
 #include "utils.h"
 #include "utils/utils.h"
+#include <asm-generic/errno-base.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -92,8 +93,10 @@ static int handle_udp_scan(const Args *args)
 
     if (state == 0)
         printf("Port %d is open\n", args->port);
-    else if (state == ECONNREFUSED || state == ETIMEDOUT)
-        printf("Port %d is filtered\n", args->port);
+    else if (state == EAGAIN)
+        printf("Port %d is filtered\n", args->port); 
+    else if (state == ECONNREFUSED)
+        printf("Port %d is closed\n", args->port); 
     else
         printf("Port %d is closed\n", args->port);
 
