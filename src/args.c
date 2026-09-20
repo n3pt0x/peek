@@ -100,7 +100,6 @@ int parse_args(int argc, char **argv, Args *args)
 {
     // Default value
     memset(args, 0, sizeof(Args));
-    args->s_type = SOCK_STREAM;
     args->flags |= SCAN_NETWORK;
 
     int opt;
@@ -114,15 +113,10 @@ int parse_args(int argc, char **argv, Args *args)
             break;
         case 'u':
             args->flags |= SCAN_UDP;
-            args->flags |= SCAN_NETWORK;
-            args->s_type = SOCK_DGRAM;
             break;
         case 'i':
-            /* Disable default scan (TCP) */
-            args->s_type = 0;
-            args->flags =~ SCAN_NETWORK;
-            
             args->flags |= SCAN_ICMP;
+            args->flags &= ~SCAN_NETWORK;
             break;
         case 'l': {
             int ttl = atoi(optarg);
@@ -143,6 +137,10 @@ int parse_args(int argc, char **argv, Args *args)
             break;
         }
         }
+    }
+
+    if (!(args->flags & SCAN_UDP) && !(args->flags & SCAN_ICMP)) {
+        args->flags |= SCAN_TCP;
     }
 
     /* Parse IP */
@@ -170,7 +168,6 @@ void debug_args(const Args *args)
     if (args->timeout) {
         printf("%d\n", args->timeout);
     }
-    printf("%s\n", args->s_type == SOCK_STREAM ? "SOCK_STREAM" : "SOCK_DGRAM");
 }
 
 void free_args(Args *args)

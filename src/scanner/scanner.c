@@ -51,7 +51,7 @@ static int handle_tcp_scan(const Args *args)
     }
 
     if (args->port) {
-        int state = scan_single_tcp_port(args, args->port);
+        int state = tcp_connect_scan(args, args->port);
         if (state < 0) {
             if (errno == ECONNREFUSED)
                 printf("Port %d is closed\n", args->port);
@@ -94,9 +94,8 @@ static int handle_udp_scan(const Args *args)
         printf("Port %d is open\n", args->port);
     else if (state == ECONNREFUSED || state == ETIMEDOUT)
         printf("Port %d is filtered\n", args->port);
-    else {
+    else
         printf("Port %d is closed\n", args->port);
-    }
 
     return 0;
 }
@@ -154,13 +153,12 @@ static int handle_icmp_scan(const Args *args)
 
 int handle_scan(const Args *args)
 {
-    if (args->s_type == SOCK_STREAM) {
+    if (args->flags & SCAN_TCP)
         return handle_tcp_scan(args);
-    } else if (args->flags & SCAN_ICMP) {
-        return handle_icmp_scan(args);
-    } else if (args->flags & SCAN_UDP) {
+    else if (args->flags & SCAN_UDP)
         return handle_udp_scan(args);
-    }
+    else if (args->flags & SCAN_ICMP)
+        return handle_icmp_scan(args);
 
     return -1;
 }

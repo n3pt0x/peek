@@ -16,7 +16,6 @@
 
 /* Struct */
 typedef struct Args {
-    int s_type;
     char *target;
     uint16_t port;
     uint16_t min_port;
