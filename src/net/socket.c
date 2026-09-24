@@ -1,6 +1,7 @@
 #include "socket.h"
 #include "utils/utils.h"
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -30,12 +31,14 @@ int socket_set_timeout(int *sock, int timeout_ms)
 
     struct timeval tv = ms_to_timeval(timeout_ms);
     if (setsockopt(*sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        fprintf(stderr, "[Error] Timeout SO_RCVTIMEO failed: %s\n", strerror(errno));
+        fprintf(stderr, "[Error] Timeout SO_RCVTIMEO failed: %s\n",
+                strerror(errno));
         return -1;
     }
 
     if (setsockopt(*sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0) {
-        fprintf(stderr, "[Error] Timeout SO_SNDTIMEO failed: %s\n", strerror(errno));
+        fprintf(stderr, "[Error] Timeout SO_SNDTIMEO failed: %s\n",
+                strerror(errno));
         return -1;
     }
 
@@ -55,4 +58,18 @@ int socket_set_ttl(int *sock, int ttl)
 
     return setsockopt(*sock, IPPROTO_ICMP, IP_TTL, (const void *)&ttl,
                       sizeof(ttl));
+}
+
+int set_nonblocking(int sock)
+{
+    int flags = fcntl(sock, F_GETFL, 0);
+    if (flags < 0) {
+        fprintf(stderr, "[Error] fcntl %s\n", strerror(errno));
+    }
+
+    if (fcntl(sock, F_SETFL, flags | O_NONBLOCK)) {
+        fprintf(stderr, "[Error] fcntl %s\n", strerror(errno));
+    }
+
+    return 0;
 }
