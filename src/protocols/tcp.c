@@ -18,11 +18,12 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int tcp_connect_scan(const Args *args, uint16_t port)
+int tcp_connect_scan(const Args *args, uint16_t port, PortState *port_state)
 {
     int sock, conn;
     struct sockaddr_in addr;
     socklen_t addr_len = sizeof(addr);
+    PortState state = PORT_UNKNOWN;
 
     sock = socket_create(AF_INET, SOCK_STREAM, 0);
 
@@ -41,11 +42,26 @@ int tcp_connect_scan(const Args *args, uint16_t port)
     conn = connect(sock, (const struct sockaddr *)&addr, addr_len);
 
     close(sock);
+
+    if (conn == 0) {
+        state = PORT_OPEN;
+    }
+
+    switch (errno) {
+    case ETIMEDOUT:
+        state = PORT_FILTERED;
+        break;
+    case ECONNREFUSED:
+        state = PORT_CLOSED;
+        break;
+    }
+
+    *port_state = state;
     return conn;
 }
 
 int tcp_connect_scan_range(const Args *args, StatusPort *open_port,
-                    size_t *port_scanned)
+                           size_t *port_scanned)
 {
     if (!is_valid_range_port(args->min_port, args->max_port)) {
         return -1;
@@ -90,7 +106,7 @@ int tcp_connect_scan_range(const Args *args, StatusPort *open_port,
         open_port[i].port = current_port;
         addr.sin_port = htons(current_port++);
         int result = connect(fds[i].fd, (struct sockaddr *)&addr, addrlen);
-        
+
         if (result < 0) {
             if (errno != EINPROGRESS) {
                 fds[i].fd = DROP_FD; // drop socket immediatly

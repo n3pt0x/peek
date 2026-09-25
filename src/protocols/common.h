@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 typedef enum {
-    PORT_UNKNOWN,
+    PORT_UNKNOWN, // Error return after packet sending
     PORT_OPEN,
     PORT_CLOSED,
     PORT_FILTERED,

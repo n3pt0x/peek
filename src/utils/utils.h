@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "protocols/common.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdbool.h>
@@ -20,5 +21,7 @@ static inline bool is_valid_range_port(int min_port, int max_port) { return is_v
 static inline bool is_valid_timeout(int timeout_ms) { return timeout_ms >= 1000 && timeout_ms <= 200000; }
 static inline bool is_valid_ttl(int ttl) { return ttl > 1 && ttl <= 255; }
 static inline bool is_valid_ip(const char *ip){ struct sockaddr_in sa; return inet_pton(AF_INET, ip, &(sa.sin_addr)); }
+
+void print_port_status(uint16_t port, PortState port_state, uint32_t flags);
 
 #endif /* UTILS_H */

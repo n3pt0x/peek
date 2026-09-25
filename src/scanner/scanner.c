@@ -27,7 +27,8 @@ static int set_timeout(int *socket, int timeout)
 static int handle_tcp_scan(const Args *args)
 {
     if (args->flags & SCAN_RANGE) {
-        StatusPort *open_port = malloc((args->max_port - args->min_port) * sizeof(StatusPort));
+        StatusPort *open_port =
+            malloc((args->max_port - args->min_port) * sizeof(StatusPort));
         memset(open_port, 0, sizeof(*open_port));
         size_t port_scanned = 0;
 
@@ -41,47 +42,22 @@ static int handle_tcp_scan(const Args *args)
             int port = open_port[i].port;
             int status = open_port[i].status;
 
-            switch (status) {
-            case PORT_OPEN:
-                printf("Port %d is open\n", port);
-                break;
-            case PORT_FILTERED:
-                printf("Port %d is filtered\n", port);
-                break;
-            case PORT_UNREACHABLE:
-                printf("Port %d is unreachable/filtered\n", port);
-                break;
-            case PORT_CLOSED:
-                if (args->flags & SCAN_VERBOSE)
-                    printf("Port %d is closed\n", port);
-                break;
-            default:
-                if (args->flags & SCAN_VERBOSE)
-                    printf("Port %d is closed\n", port);
-                break;
-            }
+            print_port_status(port, status, args->flags);
         }
         SAFE_FREE(open_port);
         return 0;
     }
 
     if (args->port) {
-        int state = tcp_connect_scan(args, args->port);
-        if (state < 0) {
-            if (errno == ECONNREFUSED)
-                printf("Port %d is closed\n", args->port);
-            else if (errno == ETIMEDOUT)
-                printf("Port %d is filtered\n", args->port);
-            else {
-                fprintf(stderr, "Port %d error: %s\n", args->port,
-                        strerror(errno));
-                return -1;
-            }
+        PortState port_state;
+        int state = tcp_connect_scan(args, args->port, &port_state);
 
-            return 0;
+        if (state < 0) {
+            if (port_state == PORT_UNKNOWN)
+                return state;
         }
 
-        printf("Port %d is %s\n", args->port, (state == 0) ? "open" : "closed");
+        print_port_status(args->port, state, args->flags);
         return 0;
     }
 
