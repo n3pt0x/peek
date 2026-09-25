@@ -2,14 +2,11 @@
 #define TCP_H
 
 #include "peek.h"
+#include "common.h"
+#include <stddef.h>
 #include <stdint.h>
 
-typedef struct StatusPort {
-    uint16_t port;
-    uint8_t status;
-} StatusPort;
-
 int tcp_connect_scan(const Args *args, uint16_t port);
-int scan_range_port(const Args *args, StatusPort *open_port, int *count);
+int tcp_connect_scan_range(const Args *args, StatusPort *open_port, size_t *port_scanned);
 
 #endif /* TCP_H */
