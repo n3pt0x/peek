@@ -27,7 +27,7 @@ static int set_timeout(int *socket, int timeout)
 static int handle_tcp_scan(const Args *args)
 {
     if (args->flags & SCAN_RANGE) {
-        StatusPort *open_port = malloc(65535 * sizeof(StatusPort));
+        StatusPort *open_port = malloc((args->max_port - args->min_port) * sizeof(StatusPort));
         memset(open_port, 0, sizeof(*open_port));
         size_t port_scanned = 0;
 
@@ -52,10 +52,12 @@ static int handle_tcp_scan(const Args *args)
                 printf("Port %d is unreachable/filtered\n", port);
                 break;
             case PORT_CLOSED:
-                printf("Port %d is closed\n", port);
+                if (args->flags & SCAN_VERBOSE)
+                    printf("Port %d is closed\n", port);
                 break;
             default:
-                printf("Port %d is closed\n", port);
+                if (args->flags & SCAN_VERBOSE)
+                    printf("Port %d is closed\n", port);
                 break;
             }
         }
