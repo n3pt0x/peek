@@ -7,15 +7,10 @@
 #include <string.h>
 
 static const struct option long_options[] = {
-    {"port", required_argument, 0, 'p'},
-    {"udp", no_argument, 0, 'u'},
-    {"icmp", no_argument, 0, 'i'},
-    {"ttl", required_argument, 0, 'l'},
-    {"timeout", required_argument, 0, 't'},
-    {"verbose", no_argument, 0, 'v'},
-    {"help", no_argument, 0, 'h'},
-    {0, 0, 0, 0}
-};
+    {"port", required_argument, 0, 'p'},    {"udp", no_argument, 0, 'u'},
+    {"icmp", no_argument, 0, 'i'},          {"ttl", required_argument, 0, 'l'},
+    {"timeout", required_argument, 0, 't'}, {"verbose", no_argument, 0, 'v'},
+    {"help", no_argument, 0, 'h'},          {0, 0, 0, 0}};
 
 static bool parse_ip(const char *ip, Args *args)
 {
@@ -38,7 +33,8 @@ static int parse_port_value(const char *str, Args *args)
     }
 
     if (!is_valid_port(port)) {
-        fprintf(stderr, "[Error] Port value must be between 0 and 65535: %i\n", port);
+        fprintf(stderr, "[Error] Port value must be between 0 and 65535: %i\n",
+                port);
         return -1;
     }
 
@@ -105,7 +101,8 @@ int parse_args(int argc, char **argv, Args *args)
     int opt;
     int option_index = 0;
 
-    while ((opt = getopt_long(argc, argv, "p:u::i::l:t:vh", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "p:u::i::l:t:vh", long_options,
+                              &option_index)) != -1) {
         switch (opt) {
         case 'p':
             if (parse_port(optarg, args) != 0)
@@ -120,17 +117,20 @@ int parse_args(int argc, char **argv, Args *args)
             break;
         case 'l': {
             int ttl = atoi(optarg);
-            if(!is_valid_ttl(ttl)) {
-                fprintf(stderr, "[Error] TTL value must be between 1 and 255\n");
+            if (!is_valid_ttl(ttl)) {
+                fprintf(stderr,
+                        "[Error] TTL value must be between 1 and 255\n");
                 return -1;
             }
             args->ttl = ttl;
             break;
         }
         case 't': {
-            unsigned long timeout = strtoul(optarg, NULL, 10) * 1000; // Convert to MS
+            unsigned long timeout =
+                strtoul(optarg, NULL, 10) * 1000; // Convert to MS
             if (!is_valid_timeout(timeout)) {
-                fprintf(stderr, "[Error] Timeout value must be between 1 and 200\n");
+                fprintf(stderr,
+                        "[Error] Timeout value must be between 1 and 200\n");
                 return -1;
             }
             args->timeout = (int)timeout;

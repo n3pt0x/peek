@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "utils/utils.h"
 #include <asm-generic/errno-base.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -28,23 +29,34 @@ static int handle_tcp_scan(const Args *args)
     if (args->flags & SCAN_RANGE) {
         StatusPort *open_port = malloc(65535 * sizeof(StatusPort));
         memset(open_port, 0, sizeof(*open_port));
-        int count = 0;
+        size_t port_scanned = 0;
 
-        if (scan_range_port(args, open_port, &count) < 0) {
+        if (tcp_connect_scan_range(args, open_port, &port_scanned) < 0) {
+            fprintf(stderr, "[Error] Scan range port has failed: %s\n",
+                    strerror(errno));
             return -1;
         }
 
-        for (int i = 0; i < count; i++) {
+        for (size_t i = 0; i < port_scanned; i++) {
             int port = open_port[i].port;
             int status = open_port[i].status;
 
-            if (port > 0) {
-                if (status == 0)
-                    printf("Port %d is open\n", port);
-                // else if (status == 1)
-                //     printf("Port %d is closed\n", args->port);
-                else if (status == 1)
-                    printf("Port %d is filtered\n", port);
+            switch (status) {
+            case PORT_OPEN:
+                printf("Port %d is open\n", port);
+                break;
+            case PORT_FILTERED:
+                printf("Port %d is filtered\n", port);
+                break;
+            case PORT_UNREACHABLE:
+                printf("Port %d is unreachable/filtered\n", port);
+                break;
+            case PORT_CLOSED:
+                printf("Port %d is closed\n", port);
+                break;
+            default:
+                printf("Port %d is closed\n", port);
+                break;
             }
         }
         SAFE_FREE(open_port);
@@ -94,9 +106,9 @@ static int handle_udp_scan(const Args *args)
     if (state == 0)
         printf("Port %d is open\n", args->port);
     else if (state == EAGAIN)
-        printf("Port %d is filtered\n", args->port); 
+        printf("Port %d is filtered\n", args->port);
     else if (state == ECONNREFUSED)
-        printf("Port %d is closed\n", args->port); 
+        printf("Port %d is closed\n", args->port);
     else
         printf("Port %d is closed\n", args->port);
 
